@@ -19,6 +19,19 @@ def status():
     connectors = {k: bool(os.getenv(v)) for k, v in keys.items()}
     return jsonify({"connectors": connectors})
 
+@connectors_bp.route("/debug", methods=["GET"])
+def debug():
+    raw_url = os.getenv("SUPABASE_URL")
+    raw_key = os.getenv("SUPABASE_SERVICE_KEY")
+    return jsonify({
+        "SUPABASE_URL_present": raw_url is not None,
+        "SUPABASE_URL_value": raw_url,
+        "SUPABASE_URL_len": len(raw_url) if raw_url else 0,
+        "SUPABASE_SERVICE_KEY_present": raw_key is not None,
+        "SUPABASE_SERVICE_KEY_len": len(raw_key) if raw_key else 0,
+        "all_env_keys_containing_SUPABASE": [k for k in os.environ.keys() if "SUPABASE" in k.upper()],
+    })
+
 @connectors_bp.route("/inboxes", methods=["GET"])
 def inboxes():
     from db import get_supabase
