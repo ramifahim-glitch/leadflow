@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from db import get_supabase
 from hubspot_sync import sync_lead
+from clay_sync import push_lead_for_enrichment
 
 leads_bp = Blueprint("leads", __name__)
 
@@ -18,7 +19,17 @@ def source_apollo():
 
 @leads_bp.route("/enrich/<id>", methods=["POST"])
 def enrich_lead(id):
-    return jsonify({"status": "enriched"})
+    sb = get_supabase()
+    res = sb.table("leads").select("*").eq("id", id).execute()
+    if not res.data:
+        return jsonify({"error": "lead not found"}), 404
+
+    lead = res.data[0]
+    result = push_lead_for_enrichment(lead)
+
+    if result.get("pushed"):
+        return jsonify({"status": "enrichment_requested"})
+    return jsonify({"status": "enrichment_skipped", "reason": result})
 
 
 @leads_bp.route("/<id>", methods=["PATCH"])
