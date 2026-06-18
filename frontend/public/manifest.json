@@ -1,0 +1,9 @@
+{
+  "short_name": "LeadFlow",
+  "name": "LeadFlow - B2B Lead Generation",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#534AB7",
+  "background_color": "#ffffff"
+}
